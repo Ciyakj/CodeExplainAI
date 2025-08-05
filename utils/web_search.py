@@ -1,8 +1,10 @@
 # utils/web_search.py
 
+# SERPAPI is not being used, so we avoid any import errors
+
 def live_search(query):
     try:
-        # Stubbed search response since SERPAPI is not configured
-        return f"(Live search is disabled. No real-time results for: {query})"
-    except:
-        return "No results from live search."
+        # Stubbed response for now
+        return f"(Live search is currently disabled. You searched for: '{query}')"
+    except Exception as e:
+        return f"Live search error: {str(e)}"
