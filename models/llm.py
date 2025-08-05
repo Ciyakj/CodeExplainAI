@@ -12,21 +12,14 @@ def call_llm(prompt):
 
 def call_gemini(prompt):
     try:
-        url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
-        headers = {
-            "Content-Type": "application/json",
-        }
-        params = {
-            "key": GEMINI_API_KEY
-        }
+        url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent"
+        params = {"key": GEMINI_API_KEY}
         data = {
-            "contents": [
-                {"parts": [{"text": prompt}]}
-            ]
+            "contents": [{"parts": [{"text": prompt}]}]
         }
-        response = requests.post(url, headers=headers, params=params, json=data)
-        response.raise_for_status()
-        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        resp = requests.post(url, headers={"Content-Type": "application/json"}, params=params, json=data)
+        resp.raise_for_status()
+        return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         return f"Gemini API Error: {str(e)}"
 
