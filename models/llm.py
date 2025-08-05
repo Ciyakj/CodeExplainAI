@@ -1,50 +1,12 @@
-# models/llm.py
-import requests
-from config.config import GEMINI_API_KEY, DEEPSEEK_API_KEY, DEFAULT_MODEL, RESPONSE_MODE
+from langchain_groq import ChatGroq
+import os
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama3-70b-8192")
 
 def call_llm(prompt):
-    if DEFAULT_MODEL == "gemini":
-        return call_gemini(prompt)
-    elif DEFAULT_MODEL == "deepseek":
-        return call_deepseek(prompt)
-    else:
-        return "Error: Unsupported model selected."
-
-import time
-
-def call_gemini(prompt):
     try:
-        time.sleep(1)  # ⏱️ Prevent rate limit
-        url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent"
-        params = {"key": GEMINI_API_KEY}
-        data = {
-            "contents": [{"parts": [{"text": prompt}]}]
-        }
-        resp = requests.post(url, headers={"Content-Type": "application/json"}, params=params, json=data)
-        resp.raise_for_status()
-        return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+        llm = ChatGroq(api_key=GROQ_API_KEY, model=GROQ_MODEL)
+        return llm.invoke(prompt)
     except Exception as e:
-        return f"Gemini API Error: {str(e)}"
-
-
-
-def call_deepseek(prompt):
-    try:
-        url = "https://api.deepseek.com/v1/chat/completions"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {DEEPSEEK_API_KEY}"
-        }
-        data = {
-            "model": "deepseek-coder",
-            "messages": [
-                {"role": "system", "content": "You are a helpful AI code assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.7
-        }
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
-        return response.json()['choices'][0]['message']['content']
-    except Exception as e:
-        return f"DeepSeek API Error: {str(e)}"
+        return f"Groq API Error: {str(e)}"
