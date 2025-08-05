@@ -1,23 +1,52 @@
+# models/llm.py
+import requests
+from config.config import GEMINI_API_KEY, DEEPSEEK_API_KEY, DEFAULT_MODEL, RESPONSE_MODE
 
-import openai
-from config.config import OPENAI_API_KEY
-openai.api_key = OPENAI_API_KEY
+def call_llm(prompt):
+    if DEFAULT_MODEL == "gemini":
+        return call_gemini(prompt)
+    elif DEFAULT_MODEL == "deepseek":
+        return call_deepseek(prompt)
+    else:
+        return "Error: Unsupported model selected."
 
-def query_openai(prompt, mode="detailed"):
+def call_gemini(prompt):
     try:
-        system_message = "You are a helpful code explanation assistant."
-        if mode == "concise":
-            prompt = f"Explain briefly: {prompt}"
-        else:
-            prompt = f"Explain in detail: {prompt}"
-
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": prompt}
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
+        headers = {
+            "Content-Type": "application/json",
+        }
+        params = {
+            "key": GEMINI_API_KEY
+        }
+        data = {
+            "contents": [
+                {"parts": [{"text": prompt}]}
             ]
-        )
-        return response.choices[0].message.content.strip()
+        }
+        response = requests.post(url, headers=headers, params=params, json=data)
+        response.raise_for_status()
+        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
-        return f"[Error querying OpenAI: {e}]"
+        return f"Gemini API Error: {str(e)}"
+
+def call_deepseek(prompt):
+    try:
+        url = "https://api.deepseek.com/v1/chat/completions"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {DEEPSEEK_API_KEY}"
+        }
+        data = {
+            "model": "deepseek-coder",
+            "messages": [
+                {"role": "system", "content": "You are a helpful AI code assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.7
+        }
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()['choices'][0]['message']['content']
+    except Exception as e:
+        return f"DeepSeek API Error: {str(e)}"
