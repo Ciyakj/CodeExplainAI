@@ -1,6 +1,6 @@
 
 import streamlit as st
-from models.llm import query_openai
+from models.llm import call_llm
 from models.embeddings import get_embedding
 from utils.file_reader import read_code_files
 from utils.rag_retriever import CodeRAGRetriever
@@ -22,7 +22,7 @@ if uploaded_files and question:
     context = "\n\n".join(retriever.query(question))
 
     full_prompt = f"Here is some code context:\n{context}\n\nUser question: {question}"
-    response = query_openai(full_prompt, mode=mode)
+    response = call_llm(prompt)
 
     if "[Error" in response:
         st.warning("LLM failed. Using web search instead.")
