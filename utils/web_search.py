@@ -1,16 +1,6 @@
-
-import requests
-from config.config import SERPAPI_API_KEY
-
 def live_search(query):
     try:
-        params = {
-            "q": query,
-            "api_key": SERPAPI_API_KEY,
-            "engine": "google"
-        }
-        res = requests.get("https://serpapi.com/search", params=params)
-        data = res.json()
-        return data["organic_results"][0]["snippet"]
+        # Placeholder: SerpAPI disabled or not in use
+        return f"(Live search is disabled. No real-time results for: {query})"
     except:
         return "No results from live search."
