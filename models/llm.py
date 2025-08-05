@@ -12,7 +12,7 @@ def call_llm(prompt):
 
 def call_gemini(prompt):
     try:
-        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
+        url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
         headers = {
             "Content-Type": "application/json",
         }
@@ -29,6 +29,7 @@ def call_gemini(prompt):
         return response.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         return f"Gemini API Error: {str(e)}"
+
 
 def call_deepseek(prompt):
     try:
