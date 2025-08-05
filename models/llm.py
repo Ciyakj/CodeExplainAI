@@ -10,8 +10,11 @@ def call_llm(prompt):
     else:
         return "Error: Unsupported model selected."
 
+import time
+
 def call_gemini(prompt):
     try:
+        time.sleep(1)  # ⏱️ Prevent rate limit
         url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent"
         params = {"key": GEMINI_API_KEY}
         data = {
@@ -22,6 +25,7 @@ def call_gemini(prompt):
         return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         return f"Gemini API Error: {str(e)}"
+
 
 
 def call_deepseek(prompt):
